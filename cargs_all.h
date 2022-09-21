@@ -7,6 +7,12 @@
 
 // #define NDEBUG
 
+enum EXIT_CODES
+{
+	RETURN_DATA_IS_NULL = 1,
+	RETURN_PARAM_IS_NULL
+};
+
 struct cargs
 {
 	char const **argv;
@@ -60,6 +66,18 @@ struct return_data set_get_arg(
 error_exit:
 	fprintf(stderr, "[ERROR] - [%s | %s] %s\n", c_full_name, c_cut_name, c_description);
 	exit(errcode);
+}
+
+
+_Bool check_flag(struct return_data const * const ret_data) {
+	if (ret_data == NULL) exit(RETURN_DATA_IS_NULL);
+	return ret_data->flag_status;
+}
+
+const char *get_param(struct return_data const * const ret_data) {
+	if (ret_data == NULL) exit(RETURN_DATA_IS_NULL);
+	if (ret_data->param == NULL) exit(RETURN_PARAM_IS_NULL);
+	return ret_data->param;
 }
 
 #endif // CARGS_H
