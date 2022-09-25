@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 
-// #define NDEBUG
+#define NDEBUG
 
 enum EXIT_CODES
 {
@@ -25,7 +25,7 @@ struct return_data {
 };
 
 void cargs_init(int argc, char const *argv[]) {
-	assert(argv != NULL); // argc > 1 && 
+	assert(argv != NULL);
 
 	cargs_init_struct.argc = argc;
 	cargs_init_struct.argv = argv;
@@ -37,6 +37,7 @@ struct return_data set_get_arg(
 	char const * const c_description,
 	_Bool is_extremely,
 	_Bool param,
+	_Bool priority,
 	int errcode
 )
 {
@@ -46,12 +47,24 @@ struct return_data set_get_arg(
 		if (!strcmp(c_full_name, cargs_init_struct.argv[i]) || 
 			!strcmp(c_cut_name, cargs_init_struct.argv[i])) {
 
-			if (!param) return (struct return_data){.param = NULL, .flag_status = 1};
+			if (!param) {
+				if (priority == 1) {
+					puts(c_description);
+					exit(0);
+				}
+
+				return (struct return_data){.param = NULL, .flag_status = 1};
+			}
 			if (i + 1 < cargs_init_struct.argc) {
 
-				if (cargs_init_struct.argv[i + 1][0] != '-') return (struct return_data){
-					.param = cargs_init_struct.argv[i + 1], .flag_status = 1
-				};
+				/*
+					if (cargs_init_struct.argv[i + 1][0] != '-') return (struct return_data){
+						.param = cargs_init_struct.argv[i + 1], .flag_status = 1
+					};
+				*/
+				return (struct return_data){
+					.param = cargs_init_struct.argv[i + 1], 
+					.flag_status = 1};
 
 				goto error_exit;
 			}
@@ -61,6 +74,7 @@ struct return_data set_get_arg(
 	}
 
 	if (is_extremely) goto error_exit;
+
 	return (struct return_data){.param = NULL, .flag_status = 0};
 
 error_exit:
